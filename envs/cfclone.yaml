@@ -18,4 +18,4 @@ dependencies:
   - scikit-bio
   - pip
   - pip:
-      - "git+ssh://git@github.com/Roth-Lab/cfclone@582d9d0daf2218f1b5a6c2d77bbaf31a933f21e9"
+      - "git+ssh://git@github.com/Roth-Lab/cfclone@5677ac9f2628171b338e65dee20fe5c9b37caa75"
