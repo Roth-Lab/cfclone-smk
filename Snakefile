@@ -19,12 +19,6 @@ include: "utils.py"
 config = ConfigManager(config)
 
 
-pathvars:
-    out_dir=config.config.get("out_dir", "results"),
-    pipeline_dir=config.config.get("pipeline_dir", "pipeline_dir")
-
-
-
 rule all:
     input:
         config.pipeline_files,
