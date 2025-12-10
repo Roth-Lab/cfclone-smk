@@ -176,6 +176,21 @@ rule write_tumour_content_file:
         "(cfclone write-tumour-content -i {input.fit} -o {output}) >{log} 2>&1"
 
 
+rule write_parameter_samples_file:
+    input:
+        fit = expand(config.fit_template, run_type="full")
+    output:
+        config.parameter_samples_file,
+    conda:
+        "envs/cfclone.yaml"
+    group:
+        "post_process"
+    log:
+        config.get_log_file(config.parameter_samples_file),
+    shell:
+        "(cfclone write-samples -i {input.fit} -o {output}) >{log} 2>&1"
+
+
 rule write_evidence:
     input:
         config.fit_template,
@@ -272,6 +287,23 @@ rule plot_pairwsie_ranks:
         config.get_log_file(config.pairwise_ranks_plot),
     shell:
         "(python {params.script} -i {input.i} -t {input.t} -o {output}) >{log} 2>&1"
+
+
+rule plot_samples:
+    input:
+        i=config.parameter_samples_file,
+    output:
+        config.samples_plot,
+    params:
+        script=workflow.source_path("scripts/plot_samples.py"),
+    conda:
+        "envs/plot.yaml"
+    group:
+        "post_process"
+    log:
+        config.get_log_file(config.samples_plot),
+    shell:
+        "(python {params.script} -i {input.i} -o {output}) >{log} 2>&1"
 
 
 rule save_run_configuration:

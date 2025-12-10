@@ -123,6 +123,14 @@ class ConfigManager(object):
     @property
     def tumour_content_file(self):
         return self.out_dir.joinpath("tables", "tumour_content.tsv")
+    
+    @property
+    def parameter_samples_file(self):
+        return self.out_dir.joinpath("tables", "parameter_samples.tsv.gz")
+    
+    @property
+    def samples_plot(self):
+        return self.out_dir.joinpath("plots", "parameter_samples.pdf")
 
     @property
     def run_type_evidence_template(self):
@@ -139,6 +147,8 @@ class ConfigManager(object):
             self.pairwise_ranks_plot,
             self.summary_file,
             self.tumour_content_file,
+            self.parameter_samples_file,
+            self.samples_plot,
         ]
 
     # Helper functions
