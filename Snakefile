@@ -53,9 +53,13 @@ rule run_cfclone:
         c=config.clone_cn_file,
         i=config.ctdna_file,
     output:
-        config.fit_template,
+        e=config.fit_report_file,
+        f=config.fit_template,
     params:
         c=config.num_chains,
+        e=lambda wildcards: str(config.fit_report_file.parent.parent).format(
+            run_type=wildcards.run_type, seed=wildcards.seed
+        ),
         r=config.num_rounds,
         v=config.num_chains_vi,
         rt=config.get_cfclone_run_type_args,
@@ -70,17 +74,23 @@ rule run_cfclone:
         "(cfclone fit "
         "-c {input.c} "
         "-i {input.i} "
-        "-o {output} "
+        "-o {output.f} "
         "-t {threads} "
+        "--exec-dir {params.e} "
         "--num-chains {params.c} "
         "--num-chains-vi {params.v} "
         "--num-rounds {params.r} "
+        "--seed {wildcards.seed} "
+        "--slice-sampling mixture "
         "{params.rt})  >{log} 2>&1"
+
+
+# TODO: Remove
 
 
 rule write_ancestral_prevlances:
     input:
-        i=str(config.fit_template).format(run_type="full"),
+        i=config.fit_template.parent.joinpath("full.h5"),
         t=config.clone_tree_file,
     output:
         o=config.ancestral_prevalence_file,
@@ -97,7 +107,7 @@ rule write_ancestral_prevlances:
 
 rule write_dominance_prob:
     input:
-        str(config.fit_template).format(run_type="full"),
+        config.fit_template.parent.joinpath("full.h5"),
     output:
         config.dominance_prob_file,
     conda:
@@ -112,7 +122,7 @@ rule write_dominance_prob:
 
 rule write_pairwise_ranks_file:
     input:
-        str(config.fit_template).format(run_type="full"),
+        config.fit_template.parent.joinpath("full.h5"),
     output:
         config.pairwise_ranks_file,
     conda:
@@ -127,7 +137,7 @@ rule write_pairwise_ranks_file:
 
 rule write_parameter_summaries_file:
     input:
-        str(config.fit_template).format(run_type="full"),
+        config.fit_template.parent.joinpath("full.h5"),
     output:
         config.parameter_summaries_file,
     conda:
@@ -142,7 +152,7 @@ rule write_parameter_summaries_file:
 
 rule write_summary_file:
     input:
-        str(config.fit_template).format(run_type="full"),
+        config.fit_template.parent.joinpath("full.h5"),
     output:
         config.summary_file,
     conda:
@@ -157,7 +167,7 @@ rule write_summary_file:
 
 rule write_tumour_content_file:
     input:
-        str(config.fit_template).format(run_type="full"),
+        config.fit_template.parent.joinpath("full.h5"),
     output:
         config.tumour_content_file,
     conda:
@@ -193,7 +203,10 @@ def get_runtypes(wildcards):
 
 rule merge_evidence:
     input:
-        expand(config.run_type_evidence_template, run_type=get_runtypes),
+        lambda wildcards: [
+            str(config.run_type_evidence_template).format(run_type=x, seed=wildcards.seed)
+            for x in get_runtypes(wildcards)
+        ],
     output:
         config.evidence_file,
     params:
@@ -259,6 +272,60 @@ rule plot_pairwsie_ranks:
         config.get_log_file(config.pairwise_ranks_plot),
     shell:
         "(python {params.script} -i {input.i} -t {input.t} -o {output}) >{log} 2>&1"
+
+
+rule merge_evidence_restarts:
+    input:
+        expand(config.evidence_file, seed=config.seeds),
+    output:
+        config.merged_evidence_file,
+    params:
+        script=workflow.source_path("scripts/merge_restart_tables.py"),
+        seeds=" ".join([str(x) for x in config.seeds]),
+    conda:
+        "envs/python.yaml"
+    group:
+        "post_process"
+    log:
+        config.get_log_file(config.merged_evidence_file),
+    shell:
+        "(python {params.script} -i {input} -o {output} -s {params.seeds}) >{log} 2>&1"
+
+
+rule merge_summary_restarts:
+    input:
+        expand(config.summary_file, seed=config.seeds),
+    output:
+        config.merged_summary_file,
+    params:
+        script=workflow.source_path("scripts/merge_restart_tables.py"),
+        seeds=" ".join([str(x) for x in config.seeds]),
+    conda:
+        "envs/python.yaml"
+    group:
+        "post_process"
+    log:
+        config.get_log_file(config.merged_summary_file),
+    shell:
+        "(python {params.script} -i {input} -o {output} -s {params.seeds}) >{log} 2>&1"
+
+
+rule merge_tumour_content_restarts:
+    input:
+        expand(config.tumour_content_file, seed=config.seeds),
+    output:
+        config.merged_tumour_content_file,
+    params:
+        script=workflow.source_path("scripts/merge_restart_tables.py"),
+        seeds=" ".join([str(x) for x in config.seeds]),
+    conda:
+        "envs/python.yaml"
+    group:
+        "post_process"
+    log:
+        config.get_log_file(config.merged_tumour_content_file),
+    shell:
+        "(python {params.script} -i {input} -o {output} -s {params.seeds}) >{log} 2>&1"
 
 
 rule save_run_configuration:

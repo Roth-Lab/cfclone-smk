@@ -35,6 +35,11 @@ properties:
     minimum: 1
     default: 8
     description: Number of parallel tempering chains used for variational distribution
+  num_restarts:
+    type: integer
+    minimum: 1
+    default: 1
+    description: Number of random restarts of sampling
   num_rounds:
     type: integer
     minimum: 1
