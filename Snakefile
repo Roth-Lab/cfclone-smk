@@ -53,13 +53,10 @@ rule run_cfclone:
         c=config.clone_cn_file,
         i=config.ctdna_file,
     output:
-        e=config.fit_report_file,
+        e=directory(config.fit_exec_dir_template),
         f=config.fit_template,
     params:
         c=config.num_chains,
-        e=lambda wildcards: str(config.fit_report_file.parent.parent).format(
-            run_type=wildcards.run_type, seed=wildcards.seed
-        ),
         r=config.num_rounds,
         v=config.num_chains_vi,
         rt=config.get_cfclone_run_type_args,
@@ -76,12 +73,11 @@ rule run_cfclone:
         "-i {input.i} "
         "-o {output.f} "
         "-t {threads} "
-        "--exec-dir {params.e} "
+        "--exec-dir {output.e} "
         "--num-chains {params.c} "
         "--num-chains-vi {params.v} "
         "--num-rounds {params.r} "
         "--seed {wildcards.seed} "
-        "--slice-sampling mixture "
         "{params.rt})  >{log} 2>&1"
 
 

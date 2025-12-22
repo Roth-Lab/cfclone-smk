@@ -113,8 +113,8 @@ class ConfigManager(object):
         return self.restart_out_dir.joinpath("fit", "{run_type}.h5")
 
     @property
-    def fit_report_file(self):
-        return self.fit_template.parent.joinpath("{run_type}", "build", "index.html")
+    def fit_exec_dir_template(self):
+        return self.restart_out_dir.joinpath("fit", "{run_type}")
 
     @property
     def fit_plot(self):
@@ -122,15 +122,15 @@ class ConfigManager(object):
 
     @property
     def merged_evidence_file(self):
-        return self.out_dir.joinpath("evidence.tsv")
+        return self.out_dir.joinpath("merged_evidence.tsv")
 
     @property
     def merged_summary_file(self):
-        return self.out_dir.joinpath("summary.tsv")
+        return self.out_dir.joinpath("merged_summary.tsv")
 
     @property
     def merged_tumour_content_file(self):
-        return self.out_dir.joinpath("tumour_content.tsv")
+        return self.out_dir.joinpath("merged_tumour_content.tsv")
 
     @property
     def pairwise_ranks_file(self):
