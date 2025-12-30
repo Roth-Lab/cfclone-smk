@@ -99,6 +99,10 @@ class ConfigManager(object):
     @property
     def fit_template(self):
         return self.out_dir.joinpath("fit", "{run_type}.h5")
+    
+    @property
+    def exec_dir(self):
+        return self.out_dir.joinpath("fit", "{run_type}")
 
     @property
     def fit_plot(self):
@@ -131,14 +135,8 @@ class ConfigManager(object):
     @property
     def pipeline_files(self):
         return [
-            self.ancestral_prevalence_file,
-            self.clone_prevalences_plot,
-            self.evidence_file,
-            self.experiment_configuration,
-            self.fit_plot,
-            self.pairwise_ranks_plot,
-            self.summary_file,
-            self.tumour_content_file,
+            str(self.fit_template).format(run_type="full"),
+            str(self.exec_dir).format(run_type="full"),
         ]
 
     # Helper functions

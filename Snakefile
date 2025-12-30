@@ -53,7 +53,8 @@ rule run_cfclone:
         c=config.clone_cn_file,
         i=config.ctdna_file,
     output:
-        config.fit_template,
+        f=config.fit_template,
+        d=directory(config.exec_dir),
     params:
         c=config.num_chains,
         r=config.num_rounds,
@@ -70,8 +71,9 @@ rule run_cfclone:
         "(cfclone fit "
         "-c {input.c} "
         "-i {input.i} "
-        "-o {output} "
+        "-o {output.f} "
         "-t {threads} "
+        "--exec-dir {output.d} "
         "--num-chains {params.c} "
         "--num-chains-vi {params.v} "
         "--num-rounds {params.r} "
