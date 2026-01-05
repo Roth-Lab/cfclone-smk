@@ -60,6 +60,10 @@ rule run_cfclone:
         r=config.num_rounds,
         v=config.num_chains_vi,
         rt=config.get_cfclone_run_type_args,
+        s=config.sampler,
+        o=config.get_cfclone_outlier_args,
+        rdr=config.get_cfclone_rdr_args,
+        baf=config.get_cfclone_baf_args,
     benchmark:
         config.get_benchmark_file(config.fit_template)
     conda:
@@ -77,6 +81,10 @@ rule run_cfclone:
         "--num-chains {params.c} "
         "--num-chains-vi {params.v} "
         "--num-rounds {params.r} "
+        "--slice-sampling {params.s} "
+        "{params.o} "
+        "{params.rdr} "
+        "{params.baf} "
         "{params.rt})  >{log} 2>&1"
 
 

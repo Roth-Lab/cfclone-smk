@@ -49,3 +49,20 @@ properties:
     type: boolean
     default: false
     description: Whether to run cfclone with additional models including only a single clone and the normal population
+  sampler:
+    type: string
+    enum: ["disable", "compose", "mixture", "only"]
+    default: "disable"
+    description: Whether to enable the sampler for additional inference of mutation assignments
+  use_outlier:
+    type: boolean
+    default: true
+    description: Whether to use outlier model
+  use_rdr:
+    type: boolean
+    default: true
+    description: Whether to use read depth ratio (RDR) information in inference
+  use_baf:
+    type: boolean
+    default: true
+    description: Whether to use B-allele frequency (BAF) information in inference

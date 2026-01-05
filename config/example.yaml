@@ -2,12 +2,15 @@ out_dir: <path/to/out_dir>
 pipeline_dir: <path/to/pipeline_dir>
 clone_cn_file: <path/to/clone_cn.tsv.gz>
 clone_tree_newick: <path/to/clone_tree.nwk>
-ctdna_files:
-  A: <path/to/sample_A.tsv.gz>
-  B: <path/to/sample_B.tsv.gz>
+ctdna_file: <path/to/sample_A.tsv.gz>
+
 # The following section is entirely optional, if omitted, default settings will be used
 # The example below lists common options to modify and is populated with the defaults
 num_chains: 12
 num_chains_vi: 12
 num_rounds: 10
 num_threads: 10
+sampler: disable
+use_outlier: True
+use_rdr: True
+use_baf: True

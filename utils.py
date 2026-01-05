@@ -32,6 +32,22 @@ class ConfigManager(object):
     @property
     def run_single_clone_model(self):
         return self.config.get("run_single_clone_model", False)
+    
+    @property
+    def sampler(self):
+        return self.config.get("sampler", "disable") # default automala
+    
+    @property
+    def use_outlier(self):
+        return self.config.get("use_outlier", True)
+    
+    @property
+    def use_rdr(self):
+        return self.config.get("use_rdr", True)
+    
+    @property
+    def use_baf(self):
+        return self.config.get("use_baf", True)
 
     # Directories
     @property
@@ -160,7 +176,28 @@ class ConfigManager(object):
         else:
             clone = run_type.split("_")[-1]
             return "--use-clone {}".format(clone)
-
+    
+    @property   
+    def get_cfclone_outlier_args(self):
+        if self.use_outlier:
+            return "--outlier"
+        else:
+            return "--no-outlier"
+        
+    @property
+    def get_cfclone_rdr_args(self):
+        if self.use_rdr:
+            return "--rdr"
+        else:
+            return "--no-rdr"
+    
+    @property
+    def get_cfclone_baf_args(self):
+        if self.use_baf:
+            return "--baf"
+        else:
+            return "--no-baf"
+        
     def _get_relative_path(self, template):
         try:
             rel_path = template.relative_to(self.pipeline_dir)
