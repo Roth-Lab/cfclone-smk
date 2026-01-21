@@ -184,20 +184,6 @@ class ConfigManager(object):
         else:
             return "--no-outlier"
         
-    @property
-    def get_cfclone_rdr_args(self):
-        if self.use_rdr:
-            return "--rdr"
-        else:
-            return "--no-rdr"
-    
-    @property
-    def get_cfclone_baf_args(self):
-        if self.use_baf:
-            return "--baf"
-        else:
-            return "--no-baf"
-        
     def _get_relative_path(self, template):
         try:
             rel_path = template.relative_to(self.pipeline_dir)

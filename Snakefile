@@ -59,11 +59,8 @@ rule run_cfclone:
         c=config.num_chains,
         r=config.num_rounds,
         v=config.num_chains_vi,
-        rt=config.get_cfclone_run_type_args,
-        s=config.sampler,
         o=config.get_cfclone_outlier_args,
-        rdr=config.get_cfclone_rdr_args,
-        baf=config.get_cfclone_baf_args,
+        rt=config.get_cfclone_run_type_args,
     benchmark:
         config.get_benchmark_file(config.fit_template)
     conda:
@@ -73,19 +70,16 @@ rule run_cfclone:
     threads: config.num_threads
     shell:
         "(cfclone fit "
-        "-c {input.c} "
-        "-i {input.i} "
-        "-o {output.f} "
-        "-t {threads} "
+        "--clone-cnv-file {input.c} "
+        "--in-file {input.i} "
+        "--out-file {output.f} "
         "--exec-dir {output.d} "
+        "--num-threads {threads} "
         "--num-chains {params.c} "
         "--num-chains-vi {params.v} "
         "--num-rounds {params.r} "
-        "--slice-sampling {params.s} "
         "{params.o} "
-        "{params.rdr} "
-        "{params.baf} "
-        "{params.rt})  >{log} 2>&1"
+        "{params.rt}) >{log} 2>&1"
 
 
 rule write_ancestral_prevlances:
