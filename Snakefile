@@ -58,7 +58,6 @@ rule run_cfclone:
     params:
         c=config.num_chains,
         r=config.num_rounds,
-        v=config.num_chains_vi,
         o=config.get_cfclone_outlier_args,
         rt=config.get_cfclone_run_type_args,
     benchmark:
@@ -76,7 +75,6 @@ rule run_cfclone:
         "--exec-dir {output.d} "
         "--num-threads {threads} "
         "--num-chains {params.c} "
-        "--num-chains-vi {params.v} "
         "--num-rounds {params.r} "
         "{params.o} "
         "{params.rt}) >{log} 2>&1"
