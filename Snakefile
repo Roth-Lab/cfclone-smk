@@ -5,9 +5,6 @@ from snakemake.utils import min_version
 min_version("9.16")
 
 
-conda: "envs/global.yaml"
-
-
 include: "utils.py"
 
 
