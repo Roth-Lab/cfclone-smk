@@ -3,13 +3,13 @@ use-conda: True
 
 latency-wait: 60
 rerun-incomplete: True
-retries: 1
+retries: 2
 local-cores: 1
 
 executor: slurm
 
 default-resources:
-    slurm_partition: upgrade
+    slurm_partition: general
     mem_mb: min(max(2*input.size_mb, 3000) * attempt, 15000)
     runtime: f"{60 * attempt}m"
 
@@ -20,4 +20,4 @@ jobs: unlimited
 set-resources:
     run_cfclone:
         mem_mb: min((1000 * threads) * attempt, 180000)
-        runtime: f"{1440 * attempt}m"
+        runtime: f"{240 * attempt}m"

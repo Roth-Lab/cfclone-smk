@@ -30,9 +30,7 @@ def main(args):
         (None, "baf_outlier_prob", "BAF outlier probability", df, False),
     ]
     for i, v in enumerate(plot_vals):
-        sub_grid = grid[i].subgridspec(
-            1, len(chroms), width_ratios=width_ratios, wspace=0.05
-        )
+        sub_grid = grid[i].subgridspec(1, len(chroms), width_ratios=width_ratios, wspace=0.05)
 
         plot_fit(
             v[3],
