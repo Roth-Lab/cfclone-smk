@@ -3,4 +3,5 @@ line_length = 120
 include = '\.smk$|^Snakefile|\.py$'
 
 [tool.black]
+line_length = 120
 skip_string_normalization = true

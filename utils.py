@@ -15,11 +15,11 @@ class ConfigManager(object):
     # Params
     @property
     def num_chains(self):
-        return self.config.get("num_chains", 16)
+        return self.config.get("num_chains", 8)
 
     @property
-    def num_chains_vi(self):
-        return self.config.get("num_chains_vi", 8)
+    def num_restarts(self):
+        return self.config.get("num_restarts", 1)
 
     @property
     def num_rounds(self):
@@ -30,17 +30,17 @@ class ConfigManager(object):
         return self.config.get("num_threads", 1)
 
     @property
-    def run_single_clone_model(self):
-        return self.config.get("run_single_clone_model", False)
+    def seeds(self):
+        return range(self.num_restarts)
 
     # Directories
     @property
     def out_dir(self):
-        return Path(self.config.get("out_dir", "<out_dir>"))
+        return Path(self.config["out_dir"])
 
     @property
     def pipeline_dir(self):
-        return Path(self.config.get("pipeline_dir", "<pipeline_dir>"))
+        return Path(self.config["pipeline_dir"])
 
     @property
     def benchmark_dir(self):
@@ -69,77 +69,103 @@ class ConfigManager(object):
 
     # Pipeline files
     @property
+    def restart_dir(self):
+        return self.out_dir.joinpath("restart_{seed}")
+
+    @property
     def ancestral_prevalence_file(self):
-        return self.out_dir.joinpath("tables", "ancestral_prevalence.tsv.gz")
+        return self.restart_dir.joinpath("tables", "ancestral_prevalence.tsv.gz")
 
     @property
     def dominance_prob_file(self):
-        return self.out_dir.joinpath("tables", "dominance_prob.tsv")
+        return self.restart_dir.joinpath("tables", "dominance_prob.tsv")
 
     @property
     def clone_prevalence_tree_file(self):
-        return self.out_dir.joinpath("trees", "prevalence_tree.json")
+        return self.restart_dir.joinpath("trees", "prevalence_tree.json")
 
     @property
     def clone_prevalences_plot(self):
-        return self.out_dir.joinpath("plots", "clone_prevalences.pdf")
-
-    @property
-    def run_type_sentinel_dir(self):
-        return self.tmp_dir.joinpath("run_type_sentinels")
+        return self.restart_dir.joinpath("plots", "clone_prevalences.pdf")
 
     @property
     def evidence_file(self):
-        return self.out_dir.joinpath("tables", "evidence.tsv")
+        return self.restart_dir.joinpath("tables", "evidence.tsv")
+
+    @property
+    def exec_dir_template(self):
+        return self.restart_dir.joinpath("fit", "{run_type}")
+
+    @property
+    def fit_template(self):
+        return self.restart_dir.joinpath("fit", "{run_type}.h5")
+
+    @property
+    def fit_plot(self):
+        return self.restart_dir.joinpath("plots", "fit.pdf")
+
+    @property
+    def pairwise_ranks_file(self):
+        return self.restart_dir.joinpath("tables", "pairwise_ranks.tsv")
+
+    @property
+    def pairwise_ranks_plot(self):
+        return self.restart_dir.joinpath("plots", "pairwise_ranks.pdf")
+
+    @property
+    def parameter_summaries_file(self):
+        return self.restart_dir.joinpath("tables", "parameter_summaries.tsv.gz")
+
+    @property
+    def run_type_evidence_template(self):
+        return self.tmp_dir.joinpath("evidence", "{seed}", "{run_type}.csv")
+
+    @property
+    def summary_file(self):
+        return self.restart_dir.joinpath("tables", "summary.tsv")
+
+    @property
+    def tumour_content_file(self):
+        return self.restart_dir.joinpath("tables", "tumour_content.tsv")
 
     @property
     def experiment_configuration(self):
         return self.out_dir.joinpath("config.yaml")
 
     @property
-    def fit_template(self):
-        return self.out_dir.joinpath("fit", "{run_type}.h5")
+    def merged_evidence_file(self):
+        return self.out_dir.joinpath("evidence.tsv")
 
     @property
-    def fit_plot(self):
-        return self.out_dir.joinpath("plots", "fit.pdf")
+    def merged_prevalence_file(self):
+        return self.out_dir.joinpath("prevalence.tsv")
 
     @property
-    def pairwise_ranks_file(self):
-        return self.out_dir.joinpath("tables", "pairwise_ranks.tsv")
+    def merged_summary_file(self):
+        return self.out_dir.joinpath("summary.tsv")
 
     @property
-    def pairwise_ranks_plot(self):
-        return self.out_dir.joinpath("plots", "pairwise_ranks.pdf")
-
-    @property
-    def parameter_summaries_file(self):
-        return self.out_dir.joinpath("tables", "parameter_summaries.tsv.gz")
-
-    @property
-    def summary_file(self):
-        return self.out_dir.joinpath("tables", "summary.tsv")
-
-    @property
-    def tumour_content_file(self):
-        return self.out_dir.joinpath("tables", "tumour_content.tsv")
-
-    @property
-    def run_type_evidence_template(self):
-        return self.tmp_dir.joinpath("evidence", "{run_type}.csv")
+    def merged_tumour_content_file(self):
+        return self.out_dir.joinpath("tumour_content.tsv")
 
     @property
     def pipeline_files(self):
-        return [
-            self.ancestral_prevalence_file,
-            self.clone_prevalences_plot,
-            self.evidence_file,
-            self.experiment_configuration,
-            self.fit_plot,
-            self.pairwise_ranks_plot,
-            self.summary_file,
-            self.tumour_content_file,
-        ]
+        result = []
+
+        for s in self.seeds:
+            result.append(self.merged_tumour_content_file)
+
+            result.append(self.merged_evidence_file)
+
+            result.append(self.merged_summary_file)
+
+            result.append(str(self.fit_plot).format(seed=s))
+
+            result.append(str(self.clone_prevalences_plot).format(seed=s))
+
+            result.append(str(self.pairwise_ranks_plot).format(seed=s))
+
+        return result
 
     # Helper functions
     def get_benchmark_file(self, template):
@@ -154,14 +180,10 @@ class ConfigManager(object):
 
     @staticmethod
     def get_cfclone_run_type_args(wildcards):
-        run_type = wildcards.run_type
-        if run_type == "full":
-            return ""
-        elif run_type == "normal":
+        if wildcards.run_type == "normal":
             return "--only-normal"
         else:
-            clone = run_type.split("_")[-1]
-            return "--use-clone {}".format(clone)
+            return ""
 
     def _get_relative_path(self, template):
         try:

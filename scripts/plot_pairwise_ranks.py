@@ -38,9 +38,7 @@ def main(args):
         vmax=1,
     )
 
-    fig.ax_heatmap.set(
-        xlabel='Clone ID: $\\mathbf{i}$', ylabel='Clone ID: $\\mathbf{j}$'
-    )
+    fig.ax_heatmap.set(xlabel='Clone ID: $\\mathbf{i}$', ylabel='Clone ID: $\\mathbf{j}$')
 
     if args.sample_id is not None:
         fig.ax_col_dendrogram.set(title="Sample: {}".format(args.sample_id))
@@ -82,9 +80,7 @@ def _index_to_ticklabels(index):
 class DendrogramPhyloPlotter:
     """Object for drawing tree of similarities between data rows/columns"""
 
-    def __init__(
-        self, data, tree, metric, method, axis, label, rotate, use_branch_lengths
-    ):
+    def __init__(self, data, tree, metric, method, axis, label, rotate, use_branch_lengths):
         """Plot a dendrogram of the relationships between the columns of data
 
         Parameters
@@ -176,9 +172,7 @@ class DendrogramPhyloPlotter:
         x_spacing = 1
 
         for node in tree.postorder():
-            curr_height, _ = node.height(
-                include_self=True, missing_as_zero=True, use_length=use_length
-            )
+            curr_height, _ = node.height(include_self=True, missing_as_zero=True, use_length=use_length)
 
             node_y = curr_height
 
@@ -190,9 +184,7 @@ class DendrogramPhyloPlotter:
                 dcoords.append([node_y, 0])
 
             else:
-                child_xcoords = np.array(
-                    [node_coord_dict[child][0] for child in node.children]
-                )
+                child_xcoords = np.array([node_coord_dict[child][0] for child in node.children])
                 node_x = child_xcoords.mean()
 
                 child_ycoords = [node_coord_dict[child][1] for child in node.children]
@@ -209,12 +201,8 @@ class DendrogramPhyloPlotter:
         dendrogram["icoord"] = icoords
         dendrogram["dcoord"] = dcoords
 
-        dendrogram_leaves = list(
-            self.data.index.get_loc(tip.name) for tip in tree.tips()
-        )
-        missing_idx = list(
-            self.data.index.get_loc(missing) for missing in self.missing_indices
-        )
+        dendrogram_leaves = list(self.data.index.get_loc(tip.name) for tip in tree.tips())
+        missing_idx = list(self.data.index.get_loc(missing) for missing in self.missing_indices)
         dendrogram_leaves.extend(missing_idx)
         dendrogram['leaves'] = np.array(dendrogram_leaves)
 
@@ -225,9 +213,7 @@ class DendrogramPhyloPlotter:
         tip_set = set(tip.name for tip in self.tree.tips())
         tip_intersect = tip_set.intersection(index_set)
         self.missing_indices = index_set - tip_set
-        self.tree = self.tree.shear(
-            tip_intersect, prune=True, strict=False, inplace=False
-        )
+        self.tree = self.tree.shear(tip_intersect, prune=True, strict=False, inplace=False)
 
     @property
     def reordered_ind(self):
@@ -344,13 +330,9 @@ class ClusterGridPhylogeny(ClusterGrid):
             except TypeError:
                 row_colors_ratio = col_colors_ratio = colors_ratio
 
-            width_ratios = self.dim_ratios_legend(
-                self.row_colors, row_dendrogram_ratio, row_colors_ratio, legend_ratio
-            )
+            width_ratios = self.dim_ratios_legend(self.row_colors, row_dendrogram_ratio, row_colors_ratio, legend_ratio)
 
-            height_ratios = self.dim_ratios(
-                self.col_colors, col_dendrogram_ratio, col_colors_ratio
-            )
+            height_ratios = self.dim_ratios(self.col_colors, col_dendrogram_ratio, col_colors_ratio)
 
             nrows = 2 if self.col_colors is None else 3
             ncols = 2 if self.row_colors is None else 3

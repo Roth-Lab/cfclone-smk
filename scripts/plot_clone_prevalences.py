@@ -11,9 +11,7 @@ import pandas as pd
 def main(args):
     df = pd.read_table(args.in_df_file)
 
-    colors = create_clone_color_dict(
-        df.loc[~df["clone_id"].str.startswith("ancestral_"), "clone_id"].unique()
-    )
+    colors = create_clone_color_dict(df.loc[~df["clone_id"].str.startswith("ancestral_"), "clone_id"].unique())
 
     with open(args.in_tree_file) as f:
         tree = nx.node_link_graph(json.load(f), edges="edges")
@@ -51,7 +49,11 @@ def plot_errorbars(colors, df, error_bars_ax):
 
         xerr_minus = x_val - df.loc[i, "lower_hdi"]
 
+        xerr_minus = max(xerr_minus, 1e-6)
+
         xerr_plus = df.loc[i, "upper_hdi"] - x_val
+
+        xerr_plus = max(xerr_plus, 1e-6)
 
         xerr = [[xerr_minus], [xerr_plus]]
 
